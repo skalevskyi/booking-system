@@ -72,10 +72,10 @@ base: process.env.GITHUB_PAGES ? '/YOUR_REPO_NAME/' : '/',
    - **Name**: `booking-system-api`
    - **Region**: той самий, що й база даних
    - **Branch**: `main`
-   - **Root Directory**: `apps/api`
-   - **Environment**: `Node`
-   - **Build Command**: `pnpm install && pnpm prisma:generate && pnpm build`
-   - **Start Command**: `pnpm start`
+    - **Root Directory**: `apps/api`
+    - **Environment**: `Node`
+    - **Build Command**: `corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm build`
+    - **Start Command**: `pnpm start`
 
 ### Крок 4: Налаштування Environment Variables
 

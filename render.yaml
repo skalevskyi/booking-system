@@ -3,8 +3,9 @@ services:
     name: booking-system-api
     env: node
     plan: free
-    buildCommand: pnpm install && cd apps/api && pnpm prisma:generate && pnpm build
-    startCommand: cd apps/api && pnpm start
+    rootDir: apps/api
+    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm build
+    startCommand: pnpm start
     envVars:
       - key: NODE_ENV
         value: production
