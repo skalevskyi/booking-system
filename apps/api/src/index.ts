@@ -14,6 +14,7 @@ import { setGlobalErrorHandler } from './middleware/error-handler.js';
 async function build() {
   const env = getEnv();
   const jwtConfig = getJWTConfig();
+  const frontendUrl = process.env.FRONTEND_URL || 'https://skalevskyi.github.io';
 
   const fastify = Fastify({
     logger: {
@@ -23,7 +24,13 @@ async function build() {
 
   // Plugins
   await fastify.register(cors, {
-    origin: env.NODE_ENV === 'production' ? false : ['http://localhost:5173'],
+    origin: env.NODE_ENV === 'production' 
+      ? [
+          frontendUrl,
+          'https://skalevskyi.github.io',
+          'https://skalevskyi.github.io/booking-system',
+        ]
+      : ['http://localhost:5173'],
     credentials: true,
   });
 

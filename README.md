@@ -405,6 +405,29 @@ booking_system/
 └── package.json
 ```
 
+## Deployment
+
+### Frontend: GitHub Pages
+
+Frontend автоматично деплоїться на GitHub Pages при push до `main` гілки.
+
+**URL:** `https://skalevskyi.github.io/booking-system/`
+
+**Налаштування:**
+1. Settings → Pages → Source: `GitHub Actions`
+2. Settings → Secrets → Actions → Додайте `VITE_API_URL` з URL вашого backend
+
+Детальні інструкції: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
+
+### Backend: Render/Railway
+
+Backend можна задеплоїти на Render або Railway.
+
+**Render:** Використайте `render.yaml` для автоматичного деплою
+**Railway:** Використайте `railway.json` для автоматичного деплою
+
+Детальні інструкції: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
+
 ## License
 
 MIT
