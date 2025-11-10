@@ -37,10 +37,9 @@ pnpm setup:env
 
 ### Ручне створення (альтернатива)
 
-Якщо потрібно створити файли вручну:
+Якщо `pnpm setup:env` не працює, створіть файли вручну:
 
 #### API (`apps/api/.env`)
-
 ```env
 NODE_ENV=development
 PORT=4000
@@ -52,28 +51,72 @@ JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 #### Web (`apps/web/.env`)
-
 ```env
 VITE_API_URL=http://localhost:4000
 ```
 
 **⚠️ ВАЖЛИВО:** Після створення файлів змініть `JWT_SECRET` та `JWT_REFRESH_SECRET` у `apps/api/.env` на безпечні випадкові значення (мінімум 32 символи).
 
-## Крок 2: Перевірка бази даних
-
-Переконайтеся, що PostgreSQL контейнер запущений:
-
+**Альтернатива через PowerShell:**
 ```powershell
-docker ps
+# API .env
+@"
+NODE_ENV=development
+PORT=4000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/booking?schema=public
+JWT_SECRET=your-super-secret-jwt-key-min-32-chars-long-change-in-production
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-min-32-chars-long-change-in-production
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+"@ | Out-File -FilePath "apps\api\.env" -Encoding utf8 -NoNewline
+
+# Web .env
+@"
+VITE_API_URL=http://localhost:4000
+"@ | Out-File -FilePath "apps\web\.env" -Encoding utf8 -NoNewline
 ```
 
-Якщо контейнер не запущений, виконайте:
+## Крок 2: Запуск бази даних PostgreSQL
 
 ```powershell
 docker compose up -d
 ```
 
-## Крок 3: Встановлення залежностей (якщо ще не встановлено)
+**Перевірка:**
+```powershell
+docker ps
+```
+
+Має бути контейнер `booking_system-db-1` зі статусом `Up`.
+
+## Крок 3: Генерація Prisma Client та міграції
+
+```powershell
+cd apps/api
+pnpm prisma:generate
+pnpm prisma:migrate
+cd ../..
+```
+
+Якщо міграції вже виконані, побачите: `Already in sync, no schema change or pending migration was found.`
+
+## Крок 4: Створення тестових послуг (seed)
+
+```powershell
+cd apps/api
+pnpm tsx prisma/seed.ts
+cd ../..
+```
+
+Це створить 4 тестові послуги:
+- Haircut (30 min, $25.00)
+- Haircut & Styling (60 min, $40.00)
+- Beard Trim (15 min, $15.00)
+- Full Service (90 min, $55.00)
+
+**Примітка:** Seed скрипт не створює дублікати, якщо послуги вже існують.
+
+## Крок 5: Встановлення залежностей (якщо ще не встановлено)
 
 ```powershell
 # Кореневі залежності
@@ -94,7 +137,7 @@ cd ../..
 - Дозволити build scripts для нативних модулів: `pnpm approve-builds bcrypt` (в apps/api)
 - Згенерувати Prisma Client: `cd apps/api && pnpm prisma:generate`
 
-## Крок 4: Налаштування нативних модулів (якщо потрібно)
+## Крок 6: Налаштування нативних модулів (якщо потрібно)
 
 Після першого встановлення залежностей може знадобитися дозволити build scripts:
 
@@ -112,7 +155,7 @@ cd ../api
 pnpm approve-builds @prisma/client prisma
 ```
 
-## Крок 5: Запуск проекту
+## Крок 7: Запуск проекту
 
 ### Варіант A: Запуск обох серверів одночасно (рекомендовано)
 
@@ -146,7 +189,7 @@ cd apps/web
 pnpm dev
 ```
 
-## Крок 6: Перегляд та валідація
+## Крок 8: Перегляд та валідація
 
 ### 1. Відкрийте веб-додаток
 

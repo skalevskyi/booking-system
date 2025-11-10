@@ -112,7 +112,67 @@ cd apps/api
 pnpm prisma:migrate
 ```
 
-## Крок 5: Повний перезапуск
+## Крок 5: Проблеми з нативними модулями
+
+### bcrypt - Cannot find module 'bcrypt_lib.node'
+
+**Проблема:** pnpm ігнорує build scripts для bcrypt, тому нативний модуль не компілюється.
+
+**Рішення:**
+```powershell
+cd apps/api
+pnpm approve-builds bcrypt
+pnpm rebuild bcrypt
+```
+
+**Альтернатива:** Якщо не працює, можна використати `bcryptjs` (JavaScript реалізація):
+```powershell
+cd apps/api
+pnpm remove bcrypt @types/bcrypt
+pnpm add bcryptjs
+pnpm add -D @types/bcryptjs
+```
+Потрібно оновити імпорт в `apps/api/src/lib/auth.ts`: `import bcrypt from 'bcryptjs'`
+
+### rollup - Cannot find module '@rollup/rollup-win32-x64-msvc'
+
+**Проблема:** Відсутній optional dependency для rollup.
+
+**Рішення:**
+```powershell
+cd apps/web
+pnpm approve-builds rollup
+pnpm install --force
+```
+
+### Prisma Client - Cannot find module 'PrismaClient'
+
+**Проблема:** Prisma Client не згенеровано після перевстановлення залежностей.
+
+**Рішення:**
+```powershell
+cd apps/api
+pnpm approve-builds @prisma/client prisma
+pnpm prisma:generate
+```
+
+## Крок 6: Проблеми сумісності версій
+
+### Swagger - expected '5.x' fastify version
+
+Якщо бачите помилку `expected '5.x' fastify version, '4.29.1' is installed`:
+
+**Рішення:** Використовуються правильні сумісні версії:
+- `@fastify/swagger@^8.15.0` (для Fastify 4.x)
+- `@fastify/swagger-ui@^2.1.0` (для Fastify 4.x)
+
+Якщо помилка залишається:
+```powershell
+cd apps/api
+pnpm install @fastify/swagger@^8.15.0 @fastify/swagger-ui@^2.1.0
+```
+
+## Крок 7: Повний перезапуск
 
 Якщо нічого не допомагає, виконайте повний перезапуск:
 
@@ -125,16 +185,22 @@ pnpm setup:env
 # 3. Запустіть базу даних
 docker compose up -d
 
-# 4. Згенеруйте Prisma Client
+# 4. Дозволити build scripts
 cd apps/api
+pnpm approve-builds bcrypt @prisma/client prisma
+cd ../web
+pnpm approve-builds rollup
+cd ../api
+
+# 5. Згенеруйте Prisma Client
 pnpm prisma:generate
 cd ../..
 
-# 5. Запустіть проект
+# 6. Запустіть проект
 pnpm dev
 ```
 
-## Крок 6: Перевірка після запуску
+## Крок 8: Перевірка після запуску
 
 Після запуску перевірте:
 
@@ -189,7 +255,7 @@ pnpm dev
 2. Перевірте, чи немає помилок компіляції TypeScript
 3. Перевірте, чи всі залежності встановлені: `cd apps/api && pnpm install`
 4. Перевірте версію Node.js (потрібна 20+): `node --version`
-5. Дивіться детальні інструкції у **QUICK_START.md** та **FIX_NATIVE_MODULES.md**
+5. Дивіться детальні інструкції у **QUICK_START.md** (розділ Troubleshooting)
 
 ## Додаткова діагностика
 
