@@ -2,7 +2,8 @@ import { FastifyInstance, FastifyError } from 'fastify';
 import { ZodError } from 'zod';
 
 export function setGlobalErrorHandler(app: FastifyInstance) {
-  app.setErrorHandler((error: FastifyError, request, reply) => {
+  app.setErrorHandler((error: FastifyError, _request, reply) => {
+    // _request is intentionally unused
     if (error instanceof ZodError) {
       reply.status(400).send({
         error: 'ValidationError',

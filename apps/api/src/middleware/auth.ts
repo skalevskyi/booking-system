@@ -1,13 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { UserRole } from '@prisma/client';
 
-export interface AuthenticatedRequest extends FastifyRequest {
-  user: {
-    userId: string;
-    email: string;
-    role: UserRole;
-  };
-}
 
 export async function authenticate(
   request: FastifyRequest,

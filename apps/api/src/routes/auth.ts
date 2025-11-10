@@ -1,9 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { prisma } from '../lib/prisma.js';
 import { hashPassword, verifyPassword, registerSchema, loginSchema } from '../lib/auth.js';
 import { getJWTConfig } from '../lib/jwt.js';
-import { AuthenticatedRequest } from '../middleware/auth.js';
 
 const refreshSchema = z.object({
   refreshToken: z.string().min(1),
@@ -44,9 +44,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       { userId: user.id, email: user.email, role: user.role },
       { expiresIn: config.accessExpiresIn },
     );
-    const refreshToken = fastify.jwt.sign(
+    const refreshToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      { secret: config.refreshSecret, expiresIn: config.refreshExpiresIn },
+      config.refreshSecret,
+      { expiresIn: config.refreshExpiresIn } as SignOptions,
     );
 
     const expiresAt = new Date();
@@ -89,9 +90,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       { userId: user.id, email: user.email, role: user.role },
       { expiresIn: config.accessExpiresIn },
     );
-    const refreshToken = fastify.jwt.sign(
+    const refreshToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      { secret: config.refreshSecret, expiresIn: config.refreshExpiresIn },
+      config.refreshSecret,
+      { expiresIn: config.refreshExpiresIn } as SignOptions,
     );
 
     const expiresAt = new Date();
@@ -124,10 +126,11 @@ export async function authRoutes(fastify: FastifyInstance) {
     const config = getJWTConfig();
 
     try {
-      const decoded = fastify.jwt.verify<{ userId: string; email: string; role: string }>(
-        body.refreshToken,
-        { secret: config.refreshSecret },
-      );
+      const decoded = jwt.verify(body.refreshToken, config.refreshSecret, {}) as {
+        userId: string;
+        email: string;
+        role: string;
+      };
 
       const tokenRecord = await prisma.refreshToken.findUnique({
         where: { token: body.refreshToken },
@@ -149,9 +152,10 @@ export async function authRoutes(fastify: FastifyInstance) {
         { userId: user.id, email: user.email, role: user.role },
         { expiresIn: config.accessExpiresIn },
       );
-      const newRefreshToken = fastify.jwt.sign(
+      const newRefreshToken = jwt.sign(
         { userId: user.id, email: user.email, role: user.role },
-        { secret: config.refreshSecret, expiresIn: config.refreshExpiresIn },
+        config.refreshSecret,
+        { expiresIn: config.refreshExpiresIn } as SignOptions,
       );
 
       const newExpiresAt = new Date();
@@ -175,7 +179,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/logout',
     { preHandler: [fastify.authenticate] },
-    async (request: AuthenticatedRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       const body = z
         .object({
           refreshToken: z.string().optional(),
@@ -196,9 +200,10 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.get(
     '/me',
     { preHandler: [fastify.authenticate] },
-    async (request: AuthenticatedRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userPayload = request.user as { userId: string; email: string; role: string };
       const user = await prisma.user.findUnique({
-        where: { id: request.user!.userId },
+        where: { id: userPayload.userId },
         select: {
           id: true,
           email: true,

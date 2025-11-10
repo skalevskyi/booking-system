@@ -1,8 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { requireRole } from '../middleware/auth.js';
-import { UserRole, BookingStatus } from '@prisma/client';
+import { BookingStatus, UserRole } from '@prisma/client';
 
 const createBookingSchema = z.object({
   serviceId: z.string().min(1, 'Service ID is required'),

@@ -16,7 +16,7 @@ const updateServiceSchema = createServiceSchema.partial();
 
 export async function servicesRoutes(fastify: FastifyInstance) {
   // GET /api/services
-  fastify.get('/services', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/services', async (_request: FastifyRequest, reply: FastifyReply) => {
     const services = await prisma.service.findMany({
       where: { active: true },
       orderBy: { createdAt: 'desc' },
