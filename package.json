@@ -1,0 +1,22 @@
+{
+  "name": "booking-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:api": "cd apps/api && pnpm dev",
+    "dev:web": "cd apps/web && pnpm dev",
+    "build": "pnpm build:api && pnpm build:web",
+    "build:api": "cd apps/api && pnpm build",
+    "build:web": "cd apps/web && pnpm build",
+    "setup:env": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-env.ps1",
+    "docker:check": "powershell -ExecutionPolicy Bypass -File ./scripts/check-docker.ps1",
+    "postgres:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-postgres-local.ps1",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
