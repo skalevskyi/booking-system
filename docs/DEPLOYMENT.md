@@ -27,22 +27,19 @@
 
 ### Крок 3: Деплой
 
-Після push до гілки `main`, GitHub Actions автоматично:
-1. Збудує frontend
-2. Задеплоїть на GitHub Pages
+Після push до гілки `main` (з змінами в `apps/web/**`), GitHub Actions автоматично:
+1. Збудує frontend з правильним `base: '/booking-system/'`
+2. Створить SPA fallback (`404.html`)
+3. Задеплоїть на GitHub Pages
 
 **URL вашого сайту буде:**
 ```
 https://YOUR_USERNAME.github.io/booking-system/
 ```
 
-### Крок 4: Оновлення base path (якщо потрібно)
+**Workflow файл:** `.github/workflows/deploy-web.yml`
 
-Якщо ваш репозиторій називається не `booking-system`, оновіть `base` у `apps/web/vite.config.ts`:
-
-```typescript
-base: process.env.GITHUB_PAGES ? '/YOUR_REPO_NAME/' : '/',
-```
+**Важливо:** Переконайтеся, що `base: '/booking-system/'` встановлено в `apps/web/vite.config.ts`
 
 ---
 
@@ -199,12 +196,14 @@ https://booking-system-production.up.railway.app
 
 ### Ручне оновлення
 
-Якщо потрібно змінити URL вручну, оновіть `.github/workflows/deploy-frontend.yml`:
+Якщо потрібно змінити URL вручну, оновіть `.github/workflows/deploy-web.yml`:
 
 ```yaml
 env:
   VITE_API_URL: 'https://your-api-url.onrender.com'
 ```
+
+**Або** додайте/оновіть secret `VITE_API_URL` у GitHub Settings → Secrets and variables → Actions
 
 ---
 
