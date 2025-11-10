@@ -29,5 +29,4 @@ databases:
   - name: booking-system-db
     plan: free
     databaseName: booking
-    user: postgres
 
