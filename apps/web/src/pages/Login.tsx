@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../lib/api';
 import { setTokens } from '../lib/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Login() {
   const navigate = useNavigate();
+  const { updateAuth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,6 +16,7 @@ export function Login() {
     mutationFn: (data: { email: string; password: string }) => authApi.login(data.email, data.password),
     onSuccess: (data) => {
       setTokens(data.accessToken, data.refreshToken);
+      updateAuth(); // Оновлюємо стан автентифікації
       navigate('/dashboard');
     },
     onError: (err: any) => {

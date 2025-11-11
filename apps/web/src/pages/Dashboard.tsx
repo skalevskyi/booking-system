@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { servicesApi, bookingsApi, authApi } from '../lib/api';
 import { clearTokens } from '../lib/auth';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 function DashboardContent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { updateAuth } = useAuth();
 
   const { data: userData } = useQuery({
     queryKey: ['me'],
@@ -40,10 +42,18 @@ function DashboardContent() {
   const handleLogout = () => {
     // Спочатку очищаємо токени та кеш
     clearTokens();
+    
+    // Оновлюємо стан автентифікації в контексті
+    updateAuth();
+    
+    // Скасовуємо всі активні запити перед очищенням кешу
+    queryClient.cancelQueries();
     queryClient.clear();
-    // Виконуємо logout API запит (асинхронно, не чекаємо)
+    
+    // Виконуємо logout API запит (не чекаємо результату)
     logoutMutation.mutate();
-    // Навігація на сторінку login (незалежно від результату API запиту)
+    
+    // Навігація на сторінку login з replace для очищення історії
     navigate('/login', { replace: true });
   };
 
