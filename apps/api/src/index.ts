@@ -1,15 +1,15 @@
-import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import Fastify from 'fastify';
 import { getEnv } from './config/env.js';
 import { getJWTConfig } from './lib/jwt.js';
-import { authRoutes } from './routes/auth.js';
-import { servicesRoutes } from './routes/services.js';
-import { bookingsRoutes } from './routes/bookings.js';
 import { authenticate } from './middleware/auth.js';
 import { setGlobalErrorHandler } from './middleware/error-handler.js';
+import { authRoutes } from './routes/auth.js';
+import { bookingsRoutes } from './routes/bookings.js';
+import { servicesRoutes } from './routes/services.js';
 
 async function build() {
   const env = getEnv();
@@ -23,15 +23,22 @@ async function build() {
   });
 
   // Plugins
-  await fastify.register(cors, {
-    origin: env.NODE_ENV === 'production' 
+  // CORS налаштування - origin має бути без шляху (тільки протокол + домен)
+  const allowedOrigins =
+    env.NODE_ENV === 'production'
       ? [
-          frontendUrl,
-          'https://skalevskyi.github.io',
-          'https://skalevskyi.github.io/booking-system',
-        ]
-      : ['http://localhost:5173'],
+        'https://skalevskyi.github.io', // Основний домен GitHub Pages
+        frontendUrl && !frontendUrl.includes('/booking-system')
+          ? frontendUrl
+          : 'https://skalevskyi.github.io', // Якщо frontendUrl містить шлях, використовуємо базовий домен
+      ].filter(Boolean)
+      : ['http://localhost:5173'];
+
+  await fastify.register(cors, {
+    origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   await fastify.register(jwt, {
