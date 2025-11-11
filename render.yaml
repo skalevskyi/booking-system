@@ -4,8 +4,8 @@ services:
     env: node
     plan: free
     rootDir: apps/api
-    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm build
-    startCommand: pnpm start
+    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm build
+    startCommand: pnpm prisma migrate deploy && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
