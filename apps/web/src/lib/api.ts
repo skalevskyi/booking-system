@@ -128,9 +128,19 @@ export const authApi = {
   },
 
   logout: async (refreshToken?: string): Promise<void> => {
-    await api.post('/api/auth/logout', { refreshToken });
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    try {
+      // Спочатку відправляємо запит (якщо є токен)
+      if (refreshToken) {
+        await api.post('/api/auth/logout', { refreshToken });
+      }
+    } catch (error) {
+      // Якщо запит не вдався, все одно продовжуємо logout
+      console.error('Logout API error:', error);
+    } finally {
+      // Завжди видаляємо токени, навіть якщо запит не вдався
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
   },
 
   me: async (): Promise<{ user: User }> => {

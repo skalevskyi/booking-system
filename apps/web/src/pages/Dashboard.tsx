@@ -28,11 +28,6 @@ function DashboardContent() {
       const refreshToken = localStorage.getItem('refreshToken');
       await authApi.logout(refreshToken || undefined);
     },
-    onSuccess: () => {
-      clearTokens();
-      queryClient.clear();
-      navigate('/login');
-    },
   });
 
   const cancelBookingMutation = useMutation({
@@ -43,7 +38,13 @@ function DashboardContent() {
   });
 
   const handleLogout = () => {
+    // Спочатку очищаємо токени та кеш
+    clearTokens();
+    queryClient.clear();
+    // Виконуємо logout API запит (асинхронно, не чекаємо)
     logoutMutation.mutate();
+    // Навігація на сторінку login (незалежно від результату API запиту)
+    navigate('/login', { replace: true });
   };
 
   const handleCancelBooking = (id: string) => {
