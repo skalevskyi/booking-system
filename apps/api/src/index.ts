@@ -87,9 +87,14 @@ async function build() {
     await authenticate(request, reply);
   });
 
-  // Health check
-  fastify.get('/health', async () => {
-    return { status: 'ok' };
+  // Health check endpoint для Render (швидкий відгук)
+  fastify.get('/health', async (_request, reply) => {
+    // Швидкий відгук для health check
+    return reply.code(200).send({ 
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
   });
 
   // Routes

@@ -4,6 +4,10 @@ services:
     env: node
     plan: free
     rootDir: apps/api
+    # Автоматичний деплой при push до main гілки
+    autoDeploy: true
+    # Health check для підтримки сервісу активним
+    healthCheckPath: /health
     buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm build
     startCommand: pnpm prisma migrate deploy && (pnpm prisma:seed || echo "Seed skipped or already done") && pnpm start
     envVars:

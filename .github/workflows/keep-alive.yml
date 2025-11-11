@@ -1,0 +1,29 @@
+name: Keep API Alive
+
+# Запускається кожні 10 хвилин для підтримки Render сервісу активним
+# Це допомагає уникнути spin down на Render free tier
+on:
+  schedule:
+    # Кожні 10 хвилин (Render free tier spin down після 15 хвилин неактивності)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Health Check
+        env:
+          API_URL: ${{ secrets.VITE_API_URL || 'https://booking-system-api-ipjr.onrender.com' }}
+        run: |
+          echo "Pinging $API_URL/health"
+          
+          response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$API_URL/health" || echo "000")
+          
+          if [ "$response" = "200" ]; then
+            echo "✅ API is alive and responding"
+          else
+            echo "⚠️ API returned status code: $response"
+            echo "This is normal if the service is spinning up (cold start takes ~30 seconds)"
+          fi
+

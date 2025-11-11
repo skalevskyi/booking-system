@@ -63,16 +63,31 @@ https://YOUR_USERNAME.github.io/booking-system/
 
 ### Крок 3: Створення Web Service
 
+**Варіант A: Автоматичний деплой через render.yaml (рекомендовано)**
+
+1. Натисніть **New +** → **Blueprint**
+2. Підключіть ваш GitHub репозиторій
+3. Render автоматично визначить `render.yaml` і створить сервіс з усіма налаштуваннями
+4. Перевірте, що в налаштуваннях сервісу:
+   - ✅ **Auto-Deploy**: `Yes` (автоматичний деплой при push до main)
+   - ✅ **Health Check Path**: `/health`
+   - ✅ **Root Directory**: `apps/api`
+
+**Варіант B: Ручне створення**
+
 1. Натисніть **New +** → **Web Service**
 2. Підключіть ваш GitHub репозиторій
 3. Заповніть форму:
    - **Name**: `booking-system-api`
    - **Region**: той самий, що й база даних
    - **Branch**: `main`
-    - **Root Directory**: `apps/api`
-    - **Environment**: `Node`
-    - **Build Command**: `corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm build`
-    - **Start Command**: `pnpm start`
+   - **Root Directory**: `apps/api`
+   - **Environment**: `Node`
+   - **Build Command**: `corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm build`
+   - **Start Command**: `pnpm prisma migrate deploy && (pnpm prisma:seed || echo "Seed skipped or already done") && pnpm start`
+4. У налаштуваннях сервісу:
+   - ✅ **Auto-Deploy**: `Yes`
+   - ✅ **Health Check Path**: `/health`
 
 ### Крок 4: Налаштування Environment Variables
 
@@ -276,7 +291,14 @@ await fastify.register(cors, {
 
 ### Backend
 
-Render/Railway автоматично перезапустить сервіс після push до `main` гілки.
+**Render:**
+- Автоматичний деплой налаштований через `render.yaml` з `autoDeploy: true`
+- Після push до `main` гілки Render автоматично визначить зміни та задеплоїть
+- Health check endpoint (`/health`) допомагає підтримувати сервіс активним
+- Keep-alive workflow (`.github/workflows/keep-alive.yml`) пінг сервіс кожні 10 хвилин
+
+**Railway:**
+- Автоматично перезапустить сервіс після push до `main` гілки
 
 ---
 
