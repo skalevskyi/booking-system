@@ -2,6 +2,18 @@
 
 Production-ready booking system with services, users, and time-based bookings.
 
+## Скріншоти
+
+### Account
+
+![Account](Screenshoots/Account.png)
+
+### Dashboard
+
+![Dashboard 1](Screenshoots/Dashboard%201.png)
+
+![Dashboard 2](Screenshoots/Dashboard%202.png)
+
 ## Tech Stack
 
 ### Backend
@@ -246,18 +258,6 @@ pnpm dev
    ```
    http://localhost:4000/docs
    ```
-
-## Скріншоти
-
-### Dashboard
-
-![Dashboard 1](Screenshoots/Dashboard%201.png)
-
-![Dashboard 2](Screenshoots/Dashboard%202.png)
-
-### Account
-
-![Account](Screenshoots/Account.png)
 
 ### Корисні команди
 
