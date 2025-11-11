@@ -42,3 +42,4 @@ Write-Host "  3. Create database: psql -U postgres -c 'CREATE DATABASE booking;'
 Write-Host "  4. Copy backend/.env.example to backend/.env and update DATABASE_URL" -ForegroundColor White
 
 
+

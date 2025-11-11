@@ -90,7 +90,7 @@ async function build() {
   // Health check endpoint для Render (швидкий відгук)
   fastify.get('/health', async (_request, reply) => {
     // Швидкий відгук для health check
-    return reply.code(200).send({ 
+    return reply.code(200).send({
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
