@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: apps/api
     buildCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm build
-    startCommand: pnpm prisma migrate deploy && pnpm start
+    startCommand: pnpm prisma migrate deploy && (pnpm prisma:seed || echo "Seed skipped or already done") && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
