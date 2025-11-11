@@ -69,7 +69,7 @@ https://YOUR_USERNAME.github.io/booking-system/
 2. Підключіть ваш GitHub репозиторій
 3. Render автоматично визначить `render.yaml` і створить сервіс з усіма налаштуваннями
 4. Перевірте, що в налаштуваннях сервісу:
-   - ✅ **Auto-Deploy**: `Yes` (автоматичний деплой при push до main)
+   - ✅ **Auto-Deploy**: `On commit` (автоматичний деплой при push до main)
    - ✅ **Health Check Path**: `/health`
    - ✅ **Root Directory**: `apps/api`
 
@@ -86,7 +86,7 @@ https://YOUR_USERNAME.github.io/booking-system/
    - **Build Command**: `corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm approve-builds bcrypt @prisma/client prisma && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm build`
    - **Start Command**: `pnpm prisma migrate deploy && (pnpm prisma:seed || echo "Seed skipped or already done") && pnpm start`
 4. У налаштуваннях сервісу:
-   - ✅ **Auto-Deploy**: `Yes`
+   - ✅ **Auto-Deploy**: `On commit` (виберіть з dropdown)
    - ✅ **Health Check Path**: `/health`
 
 ### Крок 4: Налаштування Environment Variables

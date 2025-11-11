@@ -25,16 +25,21 @@
 
 **Важливо:** Після створення сервісу через Blueprint, переконайтеся в Render Dashboard:
 1. Перейдіть до вашого сервісу `booking-system-api`
-2. Відкрийте **Settings**
-3. Перевірте:
-   - ✅ **Auto-Deploy**: `Yes` (має бути увімкнено автоматично)
-   - ✅ **Health Check Path**: `/health` (якщо не встановлено, додайте вручну)
+2. Відкрийте **Settings** → **Build & Deploy**
+3. Перевірте налаштування:
+   - ✅ **Auto-Deploy**: `On commit` (автоматичний деплой при push до main гілки)
+   - ✅ **Health Check Path**: `/health` (вже встановлено)
    - ✅ **Root Directory**: `apps/api`
+
+**Опції Auto-Deploy в Render:**
+- **On commit** - автоматичний деплой при кожному push до main (рекомендовано)
+- **After CI checks pass** - деплой після проходження CI перевірок
+- **Off** - вимкнено (потрібен ручний деплой)
 
 **Якщо сервіс створено вручну:**
 1. Перейдіть до **Settings** → **Build & Deploy**
-2. Встановіть **Auto-Deploy**: `Yes`
-3. Додайте **Health Check Path**: `/health`
+2. Встановіть **Auto-Deploy**: `On commit`
+3. Перевірте **Health Check Path**: `/health` (має бути встановлено)
 
 ## Підтримка сервісу активним (Keep-Alive)
 
