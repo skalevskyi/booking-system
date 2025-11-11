@@ -55,7 +55,11 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        // Use base path for GitHub Pages - Vite sets BASE_URL from vite.config.ts base option
+        const basePath = import.meta.env.BASE_URL || '/booking-system/';
+        // Remove trailing slash and add /login
+        const normalizedBase = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+        window.location.href = `${normalizedBase}/login`;
         return Promise.reject(refreshError);
       }
     }

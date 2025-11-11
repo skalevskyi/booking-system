@@ -1,9 +1,17 @@
-import { FastifyInstance, FastifyError } from 'fastify';
+import { FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 
 export function setGlobalErrorHandler(app: FastifyInstance) {
-  app.setErrorHandler((error: FastifyError, _request, reply) => {
-    // _request is intentionally unused
+  app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+    // Log error details for debugging
+    app.log.error({
+      err: error,
+      url: request.url,
+      method: request.method,
+      body: request.body,
+      statusCode: error.statusCode || 500,
+    }, 'Request error');
+
     if (error instanceof ZodError) {
       reply.status(400).send({
         error: 'ValidationError',
@@ -16,9 +24,12 @@ export function setGlobalErrorHandler(app: FastifyInstance) {
         message: error.message,
       });
     } else {
+      // Log full error details in development, but hide in production
+      const isDevelopment = process.env.NODE_ENV !== 'production';
       reply.status(500).send({
         error: 'InternalServerError',
-        message: 'Unexpected error',
+        message: isDevelopment ? error.message : 'Unexpected error',
+        ...(isDevelopment && { stack: error.stack }),
       });
     }
   });

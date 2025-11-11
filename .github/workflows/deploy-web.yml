@@ -45,7 +45,10 @@ jobs:
 
       - name: SPA fallback
         working-directory: apps/web
-        run: cp dist/index.html dist/404.html
+        run: |
+          cp dist/index.html dist/404.html
+          # Додаємо скрипт для перенаправлення в 404.html (якщо потрібно)
+          # GitHub Pages автоматично показує 404.html при 404 помилці
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

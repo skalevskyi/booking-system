@@ -12,60 +12,81 @@ const refreshSchema = z.object({
 export async function authRoutes(fastify: FastifyInstance) {
   // Register
   fastify.post('/register', async (request: FastifyRequest, reply: FastifyReply) => {
-    const body = registerSchema.parse(request.body);
+    try {
+      const body = registerSchema.parse(request.body);
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email: body.email },
-    });
+      const existingUser = await prisma.user.findUnique({
+        where: { email: body.email },
+      });
 
-    if (existingUser) {
-      return reply.code(400).send({ error: 'User already exists' });
+      if (existingUser) {
+        return reply.code(400).send({ error: 'User already exists' });
+      }
+
+      const hashedPassword = await hashPassword(body.password);
+      const user = await prisma.user.create({
+        data: {
+          email: body.email,
+          password: hashedPassword,
+          name: body.name,
+          role: 'CLIENT',
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+
+      const config = getJWTConfig();
+      
+      if (!config.secret || !config.refreshSecret) {
+        fastify.log.error('JWT secrets are not configured');
+        return reply.code(500).send({ error: 'Server configuration error' });
+      }
+
+      const accessToken = fastify.jwt.sign(
+        { userId: user.id, email: user.email, role: user.role },
+        { expiresIn: config.accessExpiresIn },
+      );
+      const refreshToken = jwt.sign(
+        { userId: user.id, email: user.email, role: user.role },
+        config.refreshSecret,
+        { expiresIn: config.refreshExpiresIn } as SignOptions,
+      );
+
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      await prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          expiresAt,
+        },
+      });
+
+      return reply.code(201).send({
+        user,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error: any) {
+      fastify.log.error({ err: error, body: request.body }, 'Registration error');
+      
+      if (error instanceof z.ZodError) {
+        return reply.code(400).send({
+          error: 'ValidationError',
+          message: 'Invalid request data',
+          details: error.errors,
+        });
+      }
+
+      // Re-throw to be handled by global error handler
+      throw error;
     }
-
-    const hashedPassword = await hashPassword(body.password);
-    const user = await prisma.user.create({
-      data: {
-        email: body.email,
-        password: hashedPassword,
-        name: body.name,
-        role: 'CLIENT',
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    const config = getJWTConfig();
-    const accessToken = fastify.jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      { expiresIn: config.accessExpiresIn },
-    );
-    const refreshToken = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      config.refreshSecret,
-      { expiresIn: config.refreshExpiresIn } as SignOptions,
-    );
-
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    await prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId: user.id,
-        expiresAt,
-      },
-    });
-
-    return reply.code(201).send({
-      user,
-      accessToken,
-      refreshToken,
-    });
   });
 
   // Login
