@@ -40,7 +40,7 @@ function ProfileContent() {
         <div className="bg-gradient-to-r from-primary to-primary/80 p-8 text-white">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl font-bold">
-              {getInitials(userData?.user.name, userData?.user.email)}
+              {getInitials(userData?.user.name ?? undefined, userData?.user.email ?? undefined)}
             </div>
             <div>
               <h2 className="text-2xl font-bold mb-1">

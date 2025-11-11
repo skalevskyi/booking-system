@@ -13,7 +13,7 @@ function DashboardContent() {
   const queryClient = useQueryClient();
   const [cancelBookingId, setCancelBookingId] = useState<string | null>(null);
 
-  const { data: servicesData, isLoading: servicesLoading } = useQuery({
+  const { data: servicesData } = useQuery({
     queryKey: ['services'],
     queryFn: servicesApi.getAll,
   });

@@ -116,7 +116,7 @@ export function Layout({ children }: LayoutProps) {
                   )}
                 </button>
                 <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
-                  {getInitials(userData?.user.name, userData?.user.email)}
+                  {getInitials(userData?.user.name ?? undefined, userData?.user.email ?? undefined)}
                 </div>
                 <div className="hidden sm:block">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
